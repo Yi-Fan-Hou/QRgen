@@ -1,5 +1,6 @@
 import numpy as np 
 from stopper import stopper
+from utils import *
 
 class encoder():
     def __init__(self,version,mode): 
@@ -12,6 +13,10 @@ class encoder():
         bit_string += self.character_count_indicator(len(data),self.version,self.mode)
         if self.mode.casefold() == 'numeric':
             bit_string += self.encode_numeric(data)
+        elif self.mode.casefold() == 'alphanumeric':
+            bit_string += self.encode_alphanumeric(data)
+        elif self.mode.casefold() == 'byte':
+            bit_string += self.encode_byte(data)
         
         return bit_string
         # self.debug()
@@ -52,6 +57,38 @@ class encoder():
             bit_string += '0'*(7-len(string))+string 
         return bit_string
     
+    def encode_alphanumeric(self,data):
+        nchar = len(data)
+        nfields = nchar // 2
+        nremainder = nchar % 2
+        bit_string = ''
+        for ifield in range(nfields):
+            field = data[2*ifield:2*(ifield+1)]
+            bit_string += to_bit_string(field[0]*45+field[1],length=11)
+        if nremainder == 1:
+            field = data[-1]
+            bit_string += to_bit_string(field,length=6)
+        return bit_string
+    
+    def encode_byte(self,data):
+        bit_string = '' 
+        for char in data:
+            bit_string += to_bit_string(ord(char),length=8)
+        return bit_string
+
+    # Table 5
+    def alphanumeric_table(self,char):
+        char_dict = {'0':0,'1':1,'2':2,'3':3,'4':4,'5':5,
+                     '6':6,'7':7,'8':8,'9':9,'A':10,'B':11,
+                     'C':12,'D':13,'E':14,'F':15,'G':16,'H':17,
+                     'I':18,'J':19,'K':20,'L':21,'M':22,'N':23,
+                     'O':24,'P':25,'Q':26,'R':27,'S':28,'T':29,
+                     'U':30,'V':31,'W':32,'X':33,'Y':34,'Z':35,
+                     ' ':36,'$':37,'%':38,'*':39,'+':40,'-':41,
+                     '.':42,'/':43,':':44}
+        return char_dict[char]
+
+
     # Table 2
     def mode_indicator(self,mode):
         if mode.casefold() == 'numeric'.casefold():

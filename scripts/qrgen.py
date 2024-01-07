@@ -4,12 +4,12 @@ from standard import *
 from pattern import *
 from encoder import encoder
 
-class QRcode():
+class QRgen():
     def __init__(self,data,debug=False):
         if not debug:
-            self.version = 2
-            self.error_correction_level = 'M'
-            self.encode_mode = 'numeric'
+            self.version = 5
+            self.error_correction_level = 'Q'
+            self.encode_mode = 'byte'
             self.mask_format_indicator = '010'
             
             print("Initializing...")
@@ -230,4 +230,4 @@ class QRcode():
 
 
 if __name__ == '__main__':
-    QRcode('0123456789')
+    QRgen('https://www.bilibili.com')
